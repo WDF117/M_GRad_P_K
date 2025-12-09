@@ -10,33 +10,54 @@
         Width="1100" Height="800">
 
     <Grid Margin="10">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- x1(t) -->
-        <oxy:PlotView x:Name="PlotX1"
-                      Grid.Row="0" Grid.Column="0"
-                      />
+        <!-- Панель параметров -->
+        <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top">
+            <TextBlock Text="Параметры модели" FontSize="18" FontWeight="Bold"/>
 
-        <!-- x2(t) -->
-        <oxy:PlotView x:Name="PlotX2"
-                      Grid.Row="0" Grid.Column="1"
-                      />
+            <TextBlock Text="d0 (начальный спрос)"/>
+            <TextBox x:Name="InputD0"/>
 
-        <!-- u(t) -->
-        <oxy:PlotView x:Name="PlotU"
-                      Grid.Row="1" Grid.Column="0"
-                      />
+            <TextBlock Text="c (рост спроса)"/>
+            <TextBox x:Name="InputC"/>
 
-        <!-- H(t) -->
-        <oxy:PlotView x:Name="PlotH"
-                      Grid.Row="1" Grid.Column="1"
-                      />
+            <TextBlock Text="z_max (ограничение управления)"/>
+            <TextBox x:Name="InputZmax"/>
+
+            <TextBlock Text="T (время моделирования)"/>
+            <TextBox x:Name="InputT"/>
+
+            <TextBlock Text="N (количество шагов)"/>
+            <TextBox x:Name="InputN"/>
+
+            <Button Content="Запустить расчёт" Margin="0,10,0,0"
+                    Click="RunModel_Click"/>
+
+            <Button Content="Сохранить графики" Margin="0,10,0,0"
+                    Click="SaveCharts_Click"/>
+
+        </StackPanel>
+
+        <!-- Графики -->
+        <Grid Grid.Column="1" Margin="10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <!-- x1 -->
+            <oxy:PlotView x:Name="PlotX1" Grid.Row="0"/>
+
+            <!-- u(t) -->
+            <oxy:PlotView x:Name="PlotU" Grid.Row="1"/>
+
+            <!-- H(t) -->
+            <oxy:PlotView x:Name="PlotH" Grid.Row="2"/>
+        </Grid>
     </Grid>
 </Window>
