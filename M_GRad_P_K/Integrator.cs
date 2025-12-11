@@ -1,47 +1,56 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace M_GRad_P_K
 {
     public static class Integrator
     {
-        public static void Deriv(
-            double x1, double x2, double u,
-            double G, double Y, double GAMMA, double NEY,
-            out double dx1, out double dx2)
+        // Правая часть dy/dt = z(t) – d(t)
+        public static double Deriv(double y, double u, double demand)
         {
-            dx1 = -G * u * (Y - x2) * x1 + GAMMA;
-            dx2 = G * u * (Y - x2) * x1 - NEY * x2;
+            return u - demand;
         }
 
+        // Однофазовый Рунге–Кутта 4-го порядка
         public static void ForwardRK4(
-            double[] u, double[] x1, double[] x2,
-            double G, double Y, double GAMMA, double NEY,
+            double[] u,
+            double[] y,
+            double A, double B,  // параметры спроса
             double dt)
         {
             int N = u.Length - 1;
 
             for (int i = 0; i < N; i++)
             {
-                Deriv(x1[i], x2[i], u[i], G, Y, GAMMA, NEY, out double k1x1, out double k1x2);
+                double t = i * dt;
+                double d = A + B * t;
 
-                Deriv(x1[i] + dt / 2 * k1x1, x2[i] + dt / 2 * k1x2, u[i], G, Y, GAMMA, NEY,
-                    out double k2x1, out double k2x2);
+                double k1 = Deriv(y[i], u[i], d);
 
-                Deriv(x1[i] + dt / 2 * k2x1, x2[i] + dt / 2 * k2x2, u[i], G, Y, GAMMA, NEY,
-                    out double k3x1, out double k3x2);
+                double k2 = Deriv(
+                    y[i] + dt * 0.5 * k1,
+                    u[i],
+                    A + B * (t + dt * 0.5)
+                );
 
-                Deriv(x1[i] + dt * k3x1, x2[i] + dt * k3x2, u[i], G, Y, GAMMA, NEY,
-                    out double k4x1, out double k4x2);
+                double k3 = Deriv(
+                    y[i] + dt * 0.5 * k2,
+                    u[i],
+                    A + B * (t + dt * 0.5)
+                );
 
-                x1[i + 1] = x1[i] + dt / 6 * (k1x1 + 2 * k2x1 + 2 * k3x1 + k4x1);
-                x2[i + 1] = x2[i] + dt / 6 * (k1x2 + 2 * k2x2 + 2 * k3x2 + k4x2);
+                double k4 = Deriv(
+                    y[i] + dt * k3,
+                    u[i],
+                    A + B * (t + dt)
+                );
+
+                y[i + 1] = y[i] + dt * (k1 + 2 * k2 + 2 * k3 + k4) / 6.0;
+
+                // Ограничение на нижнюю границу
+                if (y[i + 1] < 0)
+                    y[i + 1] = 0;
             }
         }
     }
-
-
 }
+

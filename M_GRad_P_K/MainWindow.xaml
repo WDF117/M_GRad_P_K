@@ -1,79 +1,62 @@
 ﻿<Window x:Class="M_GRad_P_K.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:M_GRad_P_K"
-        mc:Ignorable="d"
-         xmlns:oxy="http://oxyplot.org/wpf"
-        Title="Модель оптимального управления" 
-        Width="1100" Height="800">
-
+        xmlns:oxy="http://oxyplot.org/wpf"
+        Title="Оптимальное управление — модель запасов" Width="1200" Height="880">
     <Grid Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="320"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Панель параметров -->
-        <StackPanel Grid.Column="0" Margin="10" VerticalAlignment="Top">
-            <TextBlock Text="Параметры модели" FontSize="18" FontWeight="Bold" Margin="0,0,0,8"/>
-
-            <TextBlock Text="d0 (начальный спрос)" />
-            <TextBox x:Name="InputD0" Text="2.0"/>
-
-            <TextBlock Text="c (рост спроса)" />
-            <TextBox x:Name="InputC" Text="0.02"/>
-
-            <TextBlock Text="z_max (ограничение управления)" />
-            <TextBox x:Name="InputZmax" Text="6.0"/>
+        <!-- Параметры -->
+        <StackPanel Grid.Column="0" Margin="6" VerticalAlignment="Top">
+            <TextBlock Text="Параметры модели" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
 
             <TextBlock Text="T (время моделирования)" />
-            <TextBox x:Name="InputT" Text="250"/>
+            <TextBox x:Name="InputT" Text="250" />
 
-            <TextBlock Text="N (количество шагов)" />
-            <TextBox x:Name="InputN" Text="1000"/>
+            <TextBlock Text="N (шагов разбиения)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputN" Text="1000" />
 
-            <Separator Margin="0,8,0,8"/>
+            <TextBlock Text="a (вес для u)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputA" Text="0.03" />
 
-            <TextBlock Text="G (коэффициент взаимодействия)" />
-            <TextBox x:Name="InputG" Text="0.3"/>
+            <TextBlock Text="c (вес для y)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputC" Text="0.2" />
 
-            <TextBlock Text="Y (параметр Y)" />
-            <TextBox x:Name="InputY" Text="0.7"/>
+            <TextBlock Text="M = z_max (ограничение производства)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputM" Text="6" />
 
-            <TextBlock Text="GAMMA (источник для x1)" />
-            <TextBox x:Name="InputGamma" Text="0.25"/>
+            <TextBlock Text="y(0) (начальный запас)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputY0" Text="4" />
 
-            <TextBlock Text="NEY (затухание x2)" />
-            <TextBox x:Name="InputNEy" Text="0.4"/>
+            <TextBlock Text="z*(t) — плановое производство (z*) (постоянное значение)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputZStar" Text="1" />
 
-            <TextBlock Text="x1(0) (начальное x)" />
-            <TextBox x:Name="InputX0" Text="0.0"/>
+            <TextBlock Text="y*(t) — плановый запас (y*) (постоянное значение)" Margin="0,6,0,0" />
+            <TextBox x:Name="InputYStar" Text="2" />
 
-            <Separator Margin="0,8,0,8"/>
+            <Button Content="Запустить расчёт" Margin="0,12,0,0" Click="RunModel_Click" />
 
-            <Button Content="Запустить расчёт" Margin="0,6,0,0" Click="RunModel_Click"/>
-            <Button Content="Сохранить графики" Margin="0,6,0,0" Click="SaveCharts_Click"/>
+            <Button Content="Сохранить графики (PNG)" Margin="0,8,0,0" Click="SaveCharts_Click" />
+
+            <TextBlock Text="Примечание:" Margin="0,12,0,0" TextWrapping="Wrap"/>
+            <!--При необходимости d(t) можно поменять в коде-->
+            <TextBlock Text="Дефолтная функция спроса d(t)=0.001·t" TextWrapping="Wrap" FontStyle="Italic" FontSize="12"/>
         </StackPanel>
 
-
-        <!-- Графики -->
-        <Grid Grid.Column="1" Margin="10">
+        <!-- Графики (3 штуки: y, u, H) -->
+        <Grid Grid.Column="1" Margin="6">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- x1 -->
-            <oxy:PlotView x:Name="PlotX1" Grid.Row="0"/>
-
-            <!-- u(t) -->
-            <oxy:PlotView x:Name="PlotU" Grid.Row="1"/>
-
-            <!-- H(t) -->
-            <oxy:PlotView x:Name="PlotH" Grid.Row="2"/>
+            <oxy:PlotView x:Name="PlotY" Grid.Row="0" Margin="6"/>
+            <oxy:PlotView x:Name="PlotU" Grid.Row="1" Margin="6"/>
+            <oxy:PlotView x:Name="PlotH" Grid.Row="2" Margin="6"/>
         </Grid>
     </Grid>
 </Window>
