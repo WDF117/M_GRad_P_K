@@ -14,6 +14,7 @@ using OxyPlot.Axes;
 using OxyPlot.Series;
 using System.IO;
 using System.Globalization;
+using System.Printing;
 
 
 namespace M_GRad_P_K
@@ -26,36 +27,16 @@ namespace M_GRad_P_K
         public MainWindow()
         {
             InitializeComponent();
-            BuildAllPlots();
+            
         }
 
-        private void BuildAllPlots()
+        private void BuildAllPlots(double[] t, double[] x1, double[] x2, double[] u, double[] H)
         {
-            int N = 1000;
-            double T = 250;
-            double dt = T / N;
-
-            double[] t = new double[N + 1];
-            double[] x1 = new double[N + 1];
-            double[] x2 = new double[N + 1];
-            double[] u = new double[N + 1];
-            double[] H = new double[N + 1];
-
-            // ---- Заглушки (сюда вставишь настоящую динамику) ----
-            for (int i = 0; i <= N; i++)
-            {
-                t[i] = i * dt;
-
-                x1[i] = 1 + Math.Sin(0.02 * t[i]) + 0.05 * t[i] / T;
-                x2[i] = 0.5 + Math.Cos(0.02 * t[i]) * 0.1 + 0.003 * t[i];
-                u[i] = 3.0 + Math.Sin(0.01 * t[i]);
-                H[i] = Math.Exp(-0.01 * t[i]);
-            }
-
             BuildPlot(PlotX1, "x1(t)", t, x1);
             BuildPlot(PlotU, "u(t)", t, u);
             BuildPlot(PlotH, "H(t)", t, H);
         }
+
 
         private void BuildPlot(OxyPlot.Wpf.PlotView view, string title,
                        double[] t, double[] y)
@@ -84,74 +65,66 @@ namespace M_GRad_P_K
             model.Series.Add(series);
             view.Model = model;
         }
+        private void BuildPlots(double[] t, double[] x, double[] u, double[] H)
+        {
+            BuildPlot(PlotX1, "x(t)", t, x);
+            BuildPlot(PlotU, "u(t)", t, u);
+            BuildPlot(PlotH, "H(t)", t, H);
+        }
 
 
         private void RunModel_Click(object sender, RoutedEventArgs e)
         {
-            // Проверяем каждый параметр
+            // Проверка, что все числовые поля введены корректно
             bool ok = true;
 
-            ok &= ParseDoubleSafe(InputD0, out double d0);
-            ok &= ParseDoubleSafe(InputC, out double c);
-            ok &= ParseDoubleSafe(InputZmax, out double zmax);
+            ok &= ParseDoubleSafe(InputG, out double G);
+            ok &= ParseDoubleSafe(InputY, out double Y);
+            ok &= ParseDoubleSafe(InputR0, out double R0);
+            ok &= ParseDoubleSafe(InputR1, out double R1);
+            ok &= ParseDoubleSafe(InputGamma, out double GAMMA);
+            ok &= ParseDoubleSafe(InputNey, out double NEY);
+
+            ok &= ParseDoubleSafe(InputUMin, out double uMin);
+            ok &= ParseDoubleSafe(InputUMax, out double uMax);
+
             ok &= ParseDoubleSafe(InputT, out double T);
             ok &= ParseIntSafe(InputN, out int N);
 
+            ok &= ParseDoubleSafe(InputAStep, out double Astep);
+
             if (!ok)
             {
-                MessageBox.Show(
-                    "Некоторые параметры введены неверно.\n" +
-                    "Проверьте поля, выделенные красным.",
-                    "Ошибка ввода",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
+                MessageBox.Show("Некоторые параметры введены неверно.\nПроверь выделенные поля.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
-            // Дополнительные логические проверки
-            if (N <= 10)
+            if (N < 20)
             {
-                MessageBox.Show("N должно быть больше 10.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("N должно быть больше 20.", "Ошибка", MessageBoxButton.OK);
                 return;
             }
 
-            if (T <= 0)
-            {
-                MessageBox.Show("T должно быть больше 0.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            // ---- Запуск модели --------------------------------------------------
 
-            if (zmax <= 0)
-            {
-                MessageBox.Show("z_max должно быть положительным.",
-                    "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            ModelSolver solver = new ModelSolver();
 
-            // Если всё нормально — запускаем расчёт
-            double dt = T / N;
+            solver.Run(
+                G, Y, R0, R1,
+                GAMMA, NEY,
+                uMin, uMax,
+                T, N,
+                Astep
+            );
 
-            double[] t = new double[N + 1];
-            double[] x1 = new double[N + 1];
-            double[] u = new double[N + 1];
-            double[] H = new double[N + 1];
+            // ---- Построение графиков --------------------------------------------
 
-            for (int i = 0; i <= N; i++)
-            {
-                t[i] = i * dt;
-                double d = d0 + c * t[i];
+            BuildPlot(PlotX1, "x(t)", solver.t, solver.x1);
+            BuildPlot(PlotU, "u(t)", solver.t, solver.u);
+            BuildPlot(PlotH, "H(t)", solver.t, solver.H);
 
-                x1[i] = Math.Max(0, 10 - d + 0.5 * Math.Sin(0.2 * i));
-                u[i] = Math.Min(zmax, 3 + Math.Sin(0.02 * i));
-                H[i] = x1[i] * u[i] - d;
-            }
-
-            BuildPlot(PlotX1, "x1(t)", t, x1);
-            BuildPlot(PlotU, "u(t)", t, u);
-            BuildPlot(PlotH, "H(t)", t, H);
+            MessageBox.Show("Расчёт завершён.", "Готово", MessageBoxButton.OK);
         }
 
         private void SaveCharts_Click(object sender, RoutedEventArgs e)
@@ -229,6 +202,73 @@ namespace M_GRad_P_K
             }
 
             return ok;
+        }
+        private void Deriv(double x, double u, double G, double Y, double GAMMA, out double dx)
+        {
+            dx = -G * u * (Y - x) * x + GAMMA;
+        }
+        private void IntegrateRK4(double[] x, double[] u, int N, double dt,
+                          double G, double Y, double GAMMA)
+        {
+            for (int i = 0; i < N; i++)
+            {
+                double k1, k2, k3, k4;
+
+                Deriv(x[i], u[i], G, Y, GAMMA, out k1);
+                Deriv(x[i] + dt * 0.5 * k1, u[i], G, Y, GAMMA, out k2);
+                Deriv(x[i] + dt * 0.5 * k2, u[i], G, Y, GAMMA, out k3);
+                Deriv(x[i] + dt * k3, u[i], G, Y, GAMMA, out k4);
+
+                x[i + 1] = x[i] + dt / 6.0 * (k1 + 2 * k2 + 2 * k3 + k4);
+            }
+        }
+        private void ComputeHamiltonian(double[] H, double[] x, double[] u,
+                                double[] lambda, int N, double G, double Y, double GAMMA)
+        {
+            for (int i = 0; i <= N; i++)
+            {
+                double dx;
+                Deriv(x[i], u[i], G, Y, GAMMA, out dx);
+
+                double L = u[i] * (Y - x[i]) - x[i];   // Пример твоей L (меняется при необходимости)
+
+                H[i] = L + lambda[i] * dx;
+            }
+        }
+        private void ComputeAdjoint(double[] lambda, double[] x, double[] u,
+                            int N, double dt, double G, double Y, double GAMMA)
+        {
+            lambda[N] = 0; // терминальное условие
+
+            for (int i = N - 1; i >= 0; i--)
+            {
+                double dH_dx =
+                    -u[i]                     // ∂L/∂x
+                    + lambda[i + 1] * (       // ∂(λ·dx)/∂x
+                       -G * u[i] * x[i]       // от -G u (Y-x) x
+                       - G * u[i] * (Y - x[i]) // ещё одно x из производной
+                    );
+
+                lambda[i] = lambda[i + 1] + dt * dH_dx;
+            }
+        }
+        private void UpdateControl(double[] u, double[] x, double[] lambda,
+                           int N, double Astep, double uMin, double uMax,
+                           double G, double Y)
+        {
+            for (int i = 0; i <= N; i++)
+            {
+                double grad =
+                    (Y - x[i]) +
+                    lambda[i] * (-G * x[i] * (Y - x[i]));
+
+                double u_new = u[i] + Astep * grad;
+
+                if (u_new < uMin) u_new = uMin;
+                if (u_new > uMax) u_new = uMax;
+
+                u[i] = u_new;
+            }
         }
 
     }
