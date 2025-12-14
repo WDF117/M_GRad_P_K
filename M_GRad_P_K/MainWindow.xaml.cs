@@ -24,46 +24,29 @@ namespace M_GRad_P_K
         {
             bool ok = true;
 
-            ok &= ParseDoubleSafe(InputT, out double T);
-            ok &= ParseIntSafe(InputN, out int N);
             ok &= ParseDoubleSafe(InputA, out double a);
             ok &= ParseDoubleSafe(InputC, out double c);
             ok &= ParseDoubleSafe(InputM, out double M);
             ok &= ParseDoubleSafe(InputY0, out double y0);
-            ok &= ParseDoubleSafe(InputZStar, out double zStar);
-            ok &= ParseDoubleSafe(InputYStar, out double yStar);
+            ok &= ParseDoubleSafe(InputT, out double T);
+            ok &= ParseIntSafe(InputN, out int N);
 
             if (!ok)
             {
-                MessageBox.Show("Проверьте поля, выделенные красным.", "Ошибка ввода", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Проверьте корректность ввода данных");
                 return;
             }
 
-            if (T <= 0 || N <= 10 || a <= 0 || c <= 0 || M <= 0)
-            {
-                MessageBox.Show("Некорректные параметры (T>0, N>10, a>0, c>0, M>0).", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
+            double yStar = 2.0;
 
-            // Создаём и запускаем решатель
             var solver = new ModelSolver();
-            // Подадим параметры:
-            // a, c, M, initial y0, zStar, yStar, T, N
-            solver.Run(
-                a: a,
-                c: c,
-                M: M,
-                y0: y0,
-                zStar: zStar,
-                yStar: yStar,
-                T: T,
-                N: N);
+            solver.Run(a, c, M, y0, yStar, T, N);
 
-            // Построим графики
-            BuildPlot(PlotY, "y(t) — запасы", solver.t, solver.y);
-            BuildPlot(PlotU, "u(t) — управление (z)", solver.t, solver.u);
-            BuildPlot(PlotH, "H(t) — гамильтониан", solver.t, solver.H);
+            BuildPlot(PlotY, "y(t)", solver.t, solver.y);
+            BuildPlot(PlotU, "z(t)", solver.t, solver.z);
+            BuildPlot(PlotH, "H(t)", solver.t, solver.H);
         }
+
 
         // Экспорт каждого графика в PNG
         private void SaveCharts_Click(object sender, RoutedEventArgs e)

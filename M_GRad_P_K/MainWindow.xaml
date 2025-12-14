@@ -13,29 +13,25 @@
         <StackPanel Grid.Column="0" Margin="6" VerticalAlignment="Top">
             <TextBlock Text="Параметры модели" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
 
-            <TextBlock Text="T (время моделирования)" />
-            <TextBox x:Name="InputT" Text="250" />
+            <TextBlock Text="a (коэффициент роста)"/>
+            <TextBox x:Name="InputA"/>
 
-            <TextBlock Text="N (шагов разбиения)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputN" Text="1000" />
+            <TextBlock Text="c (постоянная часть)"/>
+            <TextBox x:Name="InputC"/>
 
-            <TextBlock Text="a (вес для u)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputA" Text="0.03" />
+            <TextBlock Text="M (ограничение управления)"/>
+            <TextBox x:Name="InputM"/>
 
-            <TextBlock Text="c (вес для y)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputC" Text="0.2" />
+            <TextBlock Text="y(0)"/>
+            <TextBox x:Name="InputY0"/>
 
-            <TextBlock Text="M = z_max (ограничение производства)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputM" Text="6" />
+            <TextBlock Text="T"/>
+            <TextBox x:Name="InputT"/>
 
-            <TextBlock Text="y(0) (начальный запас)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputY0" Text="4" />
+            <TextBlock Text="N"/>
+            <TextBox x:Name="InputN"/>
 
-            <TextBlock Text="z*(t) — плановое производство (z*) (постоянное значение)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputZStar" Text="1" />
 
-            <TextBlock Text="y*(t) — плановый запас (y*) (постоянное значение)" Margin="0,6,0,0" />
-            <TextBox x:Name="InputYStar" Text="2" />
 
             <Button Content="Запустить расчёт" Margin="0,12,0,0" Click="RunModel_Click" />
 
