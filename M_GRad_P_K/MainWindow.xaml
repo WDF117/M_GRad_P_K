@@ -14,22 +14,22 @@
             <TextBlock Text="Параметры модели" FontSize="16" FontWeight="Bold" Margin="0,0,0,8"/>
 
             <TextBlock Text="a (коэффициент роста)"/>
-            <TextBox x:Name="InputA"/>
+            <TextBox x:Name="InputA" Text="1.0"/>
 
             <TextBlock Text="c (постоянная часть)"/>
-            <TextBox x:Name="InputC"/>
+            <TextBox x:Name="InputC" Text="0.01"/>
 
             <TextBlock Text="M (ограничение управления)"/>
-            <TextBox x:Name="InputM"/>
+            <TextBox x:Name="InputM" Text="5.0"/>
 
             <TextBlock Text="y(0)"/>
-            <TextBox x:Name="InputY0"/>
+            <TextBox x:Name="InputY0" Text="0.5"/>
 
             <TextBlock Text="T"/>
-            <TextBox x:Name="InputT"/>
+            <TextBox x:Name="InputT" Text="50"/>
 
             <TextBlock Text="N"/>
-            <TextBox x:Name="InputN"/>
+            <TextBox x:Name="InputN" Text="500"/>
 
 
 
